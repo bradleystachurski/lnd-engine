@@ -44,8 +44,6 @@ function isAvailable () {
     genSeed({ client: this.walletUnlocker })
       .then(() => resolve(true))
       .catch((e) => {
-        this.logger.debug(e)
-
         // If we receive a timeout, then it means the engine is down and we can simply
         // return
         if (e.code === DEADLINE_EXCEEDED_CODE) {
@@ -69,7 +67,7 @@ function isAvailable () {
         // on our engine in production usage
         getInfo({ client: this.client })
           .then(() => resolve(true))
-          .catch(() => {
+          .catch((e) => {
             if (e.code === UNAVAILABLE_CODE || e.code === DEADLINE_EXCEEDED_CODE) {
               resolve(false)
             }
