@@ -76,12 +76,18 @@ describe('lnd-engine index', () => {
     })
 
     it('throws an error if a validation dependent action is called and the engine is not validated', () => {
+      engine.available = true
       engine.unlocked = true
       return expect(() => engine.getInvoices()).to.throw('is not validated')
     })
 
     it('throws an error if a validation dependent action is called and the engine is not validated', () => {
+      engine.available = true
       return expect(() => engine.getInvoices()).to.throw('is locked')
+    })
+
+    it('throws an error if a validation dependent action is called and the engine is not available', () => {
+      return expect(() => engine.getInvoices()).to.throw('is not available')
     })
 
     it('does not throw an error if a validation dependent action is called and the engine is not validated', () => {
@@ -89,6 +95,7 @@ describe('lnd-engine index', () => {
     })
 
     it('calls the action', () => {
+      engine.available = true
       engine.unlocked = true
       engine.validated = true
       engine.getInvoices('test', 'args')
@@ -138,6 +145,7 @@ describe('lnd-engine index', () => {
       let validationCall
 
       beforeEach(async () => {
+        engine.isAvailable = sinon.stub().resolves(true)
         engine.isEngineUnlocked = sinon.stub().resolves(true)
         engine.isNodeConfigValid = sinon.stub().resolves(true)
 
@@ -169,6 +177,11 @@ describe('lnd-engine index', () => {
       it('throws an error if lnd engine is locked', () => {
         engine.isEngineUnlocked.resolves(false)
         return expect(validationCall()).to.eventually.be.rejectedWith('LndEngine is locked')
+      })
+
+      it('throws an error if lnd engine is not available', () => {
+        engine.isAvailable.resolves(false)
+        return expect(validationCall()).to.eventually.be.rejectedWith('LndEngine is not available')
       })
     })
   })

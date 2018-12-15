@@ -46,19 +46,19 @@ function isAvailable () {
       .catch((e) => {
         // If we receive a timeout, then it means the engine is down and we can simply
         // return
-        if (e.code === DEADLINE_EXCEEDED_CODE) {
+        if (e.code === DEADLINE_EXCEEDED_CODE || e.code === UNAVAILABLE_CODE) {
           return resolve(false)
         }
 
         // If this error code is 'unavailable', then that means the node may be down
-        // however it is functioning to take at least take requests.
+        // however it is functioning to take requests.
         //
         // If the error code is 'unimplemented', then this means the engine was started
         // in development mode with 'noseedbackup' enabled
         //
         // TODO: Need to figure out a better way to handle development mode for
         //       validations
-        if (e.code !== UNAVAILABLE_CODE && e.code !== UNIMPLEMENTED_SERVICE_CODE) {
+        if (e.code !== UNIMPLEMENTED_SERVICE_CODE) {
           return resolve(true)
         }
 
