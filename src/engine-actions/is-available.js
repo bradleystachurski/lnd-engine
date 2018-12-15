@@ -60,7 +60,7 @@ function isAvailable () {
         //
         // TODO: Need to figure out a better way to handle development mode for
         //       validations
-        if (e.code && (e.code !== UNAVAILABLE_CODE && e.code !== UNIMPLEMENTED_SERVICE_CODE)) {
+        if (e.code !== UNAVAILABLE_CODE && e.code !== UNIMPLEMENTED_SERVICE_CODE) {
           return resolve(true)
         }
 
@@ -70,7 +70,7 @@ function isAvailable () {
         getInfo({ client: this.client })
           .then(() => resolve(true))
           .catch(() => {
-            if (e.code && e.code === UNAVAILABLE_CODE) {
+            if (e.code === UNAVAILABLE_CODE || e.code === DEADLINE_EXCEEDED_CODE) {
               resolve(false)
             }
 
