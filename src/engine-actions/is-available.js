@@ -44,6 +44,8 @@ function isAvailable () {
     genSeed({ client: this.walletUnlocker })
       .then(() => resolve(true))
       .catch((e) => {
+        this.logger.debug(e)
+
         // If we receive a timeout, then it means the engine is down and we can simply
         // return
         if (e.code === DEADLINE_EXCEEDED_CODE) {
@@ -63,8 +65,8 @@ function isAvailable () {
         }
 
         // We should only call `getInfo` in the case of development mode for an
-        // engine. This is because the WalletUnlocker RPC (genSeed) should always
-        // be available on our engine in production usage
+        // engine since the WalletUnlocker RPC (genSeed) should always be available
+        // on our engine in production usage
         getInfo({ client: this.client })
           .then(() => resolve(true))
           .catch(() => {
