@@ -4,6 +4,16 @@ const {
 } = require('../lnd-actions')
 
 /**
+ * CODE 4 for gRPC is equal to 'deadline exceeded'
+ *
+ * @see https://github.com/grpc/grpc-go/blob/master/codes/codes.go
+ * @constant
+ * @type {Number}
+ * @default
+ */
+const DEADLINE_EXCEEDED_CODE = 4
+
+/**
  * CODE 12 for gRPC is equal to 'unimplemented'
  *
  * @see https://github.com/grpc/grpc-go/blob/master/codes/codes.go
@@ -34,6 +44,12 @@ function isAvailable () {
     genSeed({ client: this.walletUnlocker })
       .then(() => resolve(true))
       .catch((e) => {
+        // If we receive a timeout, then it means the engine is down and we can simply
+        // return
+        if (e.code === DEADLINE_EXCEEDED_CODE) {
+          return resolve(false)
+        }
+
         // If this error code is 'unavailable', then that means the node may be down
         // however it is functioning to take at least take requests.
         //
