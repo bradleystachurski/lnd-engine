@@ -51,6 +51,14 @@ class LndEngine {
     this.client = generateLightningClient(this)
     this.walletUnlocker = generateWalletUnlockerClient(this)
 
+    // This key identifies if the current Engine can handle any requests from
+    // the user. This typically means that an engine is syncing or permanently
+    // down, where we do not have access to any RPCs
+    //
+    // We set `available` to false by default, however this will be modified in the
+    // `validateEngine` action
+    this.available = false
+
     // This key identifies if the current Engine still requires additional setup
     // before commands can be made against the LN RPC
     //
@@ -74,6 +82,7 @@ class LndEngine {
     // functioning correctly.
     Object.entries(validationDependentActions).forEach(([name, action]) => {
       this[name] = (...args) => {
+        if (!this.available) throw new Error(`${symbol} Engine is not available`)
         if (!this.unlocked) throw new Error(`${symbol} Engine is locked`)
         if (!this.validated) throw new Error(`${symbol} Engine is not validated`)
         return action.call(this, ...args)
@@ -95,6 +104,15 @@ class LndEngine {
       const payload = { symbol: this.symbol }
       const errorMessage = 'Engine failed to validate. Retrying'
       const validationCall = async () => {
+        // We want to check if the engine is `available` before we continue with any
+        // validations measures. The engine may not be available if we are still waiting
+        // for a blockchain to sync, or if the node is down permanently
+        this.available = await this.isAvailable()
+
+        if (!this.available) {
+          throw new Error('LndEngine is not available, unable to validate config')
+        }
+
         // An Engine is `locked` when no wallet is present OR if LND Engine requires
         // a password to unlock the current wallet
         //

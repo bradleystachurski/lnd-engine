@@ -47,7 +47,6 @@ module.exports = {
     createInvoice,
     createNewAddress,
     createSwapHash,
-    isAvailable,
     isInvoicePaid,
     isBalanceSufficient,
     payInvoice,
@@ -72,6 +71,7 @@ module.exports = {
     createWallet,
     isNodeConfigValid,
     isEngineUnlocked,
+    isAvailable,
     unlockWallet
   }
 }
