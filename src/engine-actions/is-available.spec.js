@@ -4,7 +4,7 @@ const { expect, rewire, sinon } = require('test/test-helper')
 const isAvailable = rewire(path.resolve(__dirname, 'is-available'))
 
 describe('is-available', () => {
-  describe.only('isAvailable', () => {
+  describe('isAvailable', () => {
     let getInfoStub
     let engine
     let genSeedStub
